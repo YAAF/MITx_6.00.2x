@@ -459,16 +459,13 @@ class TreatedPatient(Patient):
         counter = 0
         i = 1
         for virus in self.viruses:
-            # print('current virus being examined ', 'virus' + str(i))
             toAdd = True
             for drug in drugResist:
                 try:
-                    # print('current drug being examined ', drug)
                     if not virus.getResistances()[drug]:
                         toAdd = False
                 except KeyError:
                     toAdd = False
-                # print(toAdd)
             if toAdd:
                 counter += 1
 
@@ -476,24 +473,6 @@ class TreatedPatient(Patient):
                 
         return counter
 
-        # notToAll = False
-        # counter = 0
-        # for virus in self.viruses:
-        #     for drug in drugResist:
-        #         try:
-        #             if not virus.getResistances()[drug]:
-        #                 notToAll = True
-        #         except KeyError:
-        #             notToAll = True
-        #         else:
-        #             notToAll = False
-
-        #     if not notToAll:
-        #         counter += 1
-        
-        # return counter
-                
-            
 
 
     def update(self):
@@ -571,3 +550,36 @@ def simulationWithDrug(numViruses, maxPop, maxBirthProb, clearProb, resistances,
     """
 
     # TODO
+    totViruses = []
+    for j in range(numViruses):
+        createVirus = ResistantVirus(maxBirthProb, clearProb, resistances, mutProb)
+        totViruses.append(createVirus)
+
+    
+    allVirPop = [0]*300
+    gutResPop = [0]*300
+    for i in range(numTrials):
+        patient = TreatedPatient(totViruses, maxPop)
+        for j in range(300):
+            if j == 150:
+                patient.addPrescription('guttagonol')
+            allVirPop[j] = allVirPop[j] + patient.update()
+            gutResPop[j] = gutResPop[j] + patient.getResistPop(['guttagonol'])
+    
+    aveAllVirPop = [l/numTrials for l in allVirPop]
+    aveGutResPop = [k/numTrials for k in gutResPop]
+    
+    pylab.figure()
+    pylab.plot(aveAllVirPop, 
+               label = "Total virus population")
+    pylab.plot(aveGutResPop, 
+               label = "Guttagonol Resistant Virus population")
+    pylab.title("ResistantVirus simulation")
+    pylab.xlabel("Time Steps")
+    pylab.ylabel("Average Virus Population")
+    pylab.legend(loc = "best")
+    pylab.show()
+                
+
+    
+    
