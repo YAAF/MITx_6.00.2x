@@ -313,7 +313,10 @@ class ResistantVirus(SimpleVirus):
         """
         
         # TODO
-        return self.resistance[drug]
+        if drug in self.resistance.keys():
+            return self.resistance[drug]
+        else:
+            False
 
 
     def reproduce(self, popDensity, activeDrugs):
@@ -404,6 +407,9 @@ class TreatedPatient(Patient):
         """
 
         # TODO
+        
+        Patient.__init__(self, viruses, maxPop)
+        self.drugs = []
 
 
     def addPrescription(self, newDrug):
@@ -418,6 +424,10 @@ class TreatedPatient(Patient):
         """
 
         # TODO
+        if newDrug in self.drugs:
+            pass
+        else: 
+            self.drugs.append(newDrug)
 
 
     def getPrescriptions(self):
@@ -429,6 +439,8 @@ class TreatedPatient(Patient):
         """
 
         # TODO
+        return self.drugs
+        
 
 
     def getResistPop(self, drugResist):
@@ -444,6 +456,44 @@ class TreatedPatient(Patient):
         """
 
         # TODO
+        counter = 0
+        i = 1
+        for virus in self.viruses:
+            # print('current virus being examined ', 'virus' + str(i))
+            toAdd = True
+            for drug in drugResist:
+                try:
+                    # print('current drug being examined ', drug)
+                    if not virus.getResistances()[drug]:
+                        toAdd = False
+                except KeyError:
+                    toAdd = False
+                # print(toAdd)
+            if toAdd:
+                counter += 1
+
+            i += 1
+                
+        return counter
+
+        # notToAll = False
+        # counter = 0
+        # for virus in self.viruses:
+        #     for drug in drugResist:
+        #         try:
+        #             if not virus.getResistances()[drug]:
+        #                 notToAll = True
+        #         except KeyError:
+        #             notToAll = True
+        #         else:
+        #             notToAll = False
+
+        #     if not notToAll:
+        #         counter += 1
+        
+        # return counter
+                
+            
 
 
     def update(self):
@@ -468,7 +518,30 @@ class TreatedPatient(Patient):
         """
 
         # TODO
-
+        
+        virToRem = []
+        for virus in self.viruses:
+            if virus.doesClear():
+                virToRem.append(virus)
+        
+        for virus in virToRem:
+            self.viruses.remove(virus)
+        
+        curPopDen = self.getTotalPop()/self.getMaxPop()
+        
+        
+        
+        newViruses = []
+        for virus in self.viruses:
+            try:
+                toReproduce = virus.reproduce(curPopDen, self.drugs)
+                newViruses.append(toReproduce)
+            except NoChildException:
+                pass
+        
+        self.viruses = self.viruses + newViruses
+        
+        return self.getTotalPop()
 
 
 #
