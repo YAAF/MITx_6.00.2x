@@ -1,11 +1,11 @@
 # Problem Set 3: Simulating the Spread of Disease and Virus Population Dynamics 
 
 import random
-import pylab
 
 ''' 
 Begin helper code
 '''
+
 
 class NoChildException(Exception):
     """
@@ -14,6 +14,7 @@ class NoChildException(Exception):
     reproduce. You can use NoChildException as is, you do not need to
     modify/add any code.
     """
+    
 
 '''
 End helper code
@@ -36,18 +37,23 @@ class SimpleVirus(object):
         """
 
         # TODO
+        self.maxBirthProb = maxBirthProb
+        self.clearProb = clearProb
+        
 
     def getMaxBirthProb(self):
         """
         Returns the max birth probability.
         """
         # TODO
+        return self.maxBirthProb
 
     def getClearProb(self):
         """
         Returns the clear probability.
         """
         # TODO
+        return self.clearProb
 
     def doesClear(self):
         """ Stochastically determines whether this virus particle is cleared from the
@@ -56,7 +62,9 @@ class SimpleVirus(object):
         False.
         """
 
-        # TODO
+
+        return random.random() < self.getClearProb()
+
 
     
     def reproduce(self, popDensity):
@@ -80,6 +88,14 @@ class SimpleVirus(object):
         """
 
         # TODO
+        probOfRep = self.maxBirthProb * (1 - popDensity)
+
+        if random.random() < probOfRep:
+            return SimpleVirus(self.maxBirthProb, self.clearProb)
+        else:
+            raise NoChildException()
+            
+        
 
 
 
@@ -101,12 +117,15 @@ class Patient(object):
         """
 
         # TODO
+        self.viruses = viruses
+        self.maxPop = maxPop
 
     def getViruses(self):
         """
         Returns the viruses in this Patient.
         """
         # TODO
+        return self.viruses
 
 
     def getMaxPop(self):
@@ -114,6 +133,7 @@ class Patient(object):
         Returns the max population.
         """
         # TODO
+        return self.maxPop
 
 
     def getTotalPop(self):
@@ -122,7 +142,8 @@ class Patient(object):
         returns: The total virus population (an integer)
         """
 
-        # TODO        
+        # TODO 
+        return len(self.viruses)
 
 
     def update(self):
@@ -145,6 +166,37 @@ class Patient(object):
         """
 
         # TODO
+        
+        virToRem = []
+        for virus in self.viruses:
+            if virus.doesClear():
+                virToRem.append(virus)
+        
+        for virus in virToRem:
+            self.viruses.remove(virus)
+        
+        
+        curPopDen = self.getTotalPop()/self.getMaxPop()
+        
+        newViruses = []
+        for virus in self.viruses:
+            try:
+                toReproduce = virus.reproduce(curPopDen)
+                newViruses.append(toReproduce)
+            except NoChildException:
+                pass
+        
+        self.viruses = self.viruses + newViruses
+        
+        return self.getTotalPop()
+        
+        
+            
+        
+        
+            
+        
+        
 
 
 
