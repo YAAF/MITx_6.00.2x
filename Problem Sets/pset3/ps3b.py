@@ -364,14 +364,14 @@ class ResistantVirus(SimpleVirus):
         # TODO
         
         for drug in activeDrugs:
-            if not self.isResistantTo(drug):
+            if not self.resistance[drug]:
                 raise NoChildException()
         
         probOfRep = self.maxBirthProb * (1 - popDensity)
 
         if random.random() < probOfRep:
-            offspringResistance = {}
-            for drug in activeDrugs:
+            offspringResistance = self.resistance.copy()
+            for drug in self.resistance:
                 toSwitch = bool(random.random() < self.mutProb)
                 if toSwitch:
                     offspringResistance[drug] = not self.resistance[drug]
