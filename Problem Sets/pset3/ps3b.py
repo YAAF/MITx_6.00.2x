@@ -1,6 +1,7 @@
 # Problem Set 3: Simulating the Spread of Disease and Virus Population Dynamics 
 
 import random
+import pylab
 
 ''' 
 Begin helper code
@@ -220,6 +221,34 @@ def simulationWithoutDrug(numViruses, maxPop, maxBirthProb, clearProb,
     """
 
     # TODO
+    allVirPop = {}
+    initialVirPop = []
+    for j in range(numViruses):
+        createVirus = SimpleVirus(maxBirthProb, clearProb)
+        initialVirPop.append(createVirus)
+        
+    for i in range(numTrials):
+        patient = Patient(initialVirPop, maxPop)
+        allVirPop['Trial' + str(i+1)] = []
+        for k in range(300):
+            allVirPop['Trial' + str(i+1)].append(patient.update())
+    
+    aveValues = []
+    for k in range(300):
+        aveValue = 0
+        for l in range(numTrials):
+            aveValue += allVirPop['Trial' + str(l+1)][k]
+        aveValue = aveValue/numTrials
+        aveValues.append(aveValue)
+    
+    
+    pylab.plot(aveValues, label = "SimpleVirus")
+    pylab.title("SimpleVirus simulation")
+    pylab.xlabel("Time Steps")
+    pylab.ylabel("Average Virus Population")
+    pylab.legend(loc = "best")
+    pylab.show()
+                
 
 
 
