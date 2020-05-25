@@ -152,7 +152,13 @@ def r_squared(y, estimated):
         a float for the R-squared error term
     """
     # TODO
-    pass
+    yVals = np.array(y)
+    yEsts = np.array(estimated)
+    numerator = np.sum(np.square(yVals - yEsts))
+    denominator = np.sum(np.square(yVals - np.mean(yVals)))
+    r2 = 1 - numerator/denominator
+    
+    return r2
 
 # Problem 3
 def evaluate_models_on_training(x, y, models):
@@ -177,7 +183,22 @@ def evaluate_models_on_training(x, y, models):
         None
     """
     # TODO
-    pass
+    xVals = np.array(x)
+    yVals = np.array(y)
+    
+    pylab.plot(xVals, yVals, 'bo', label = 'Recorded Temperature Values')
+    pylab.xlabel('Year')
+    pylab.ylabel('Temperature')
+    pylab.title('Fitting models with different degrees')
+    
+    for model in models:
+        yEsts = np.polyval(model, xVals)
+        R2 = r_squared(yVals, yEsts)
+        pylab.plot(xVals, yEsts, 'r',
+                   label = 'Model with degree ' + str(len(model) - 1) \
+                       + ' , R2 = ' + str(round(R2, 5)))
+        pylab.legend(loc = 'best')
+                   
 
 
 ### Begining of program
@@ -186,10 +207,10 @@ raw_data = Climate('data.csv')
 # Problem 3
 y = []
 x = INTERVAL_1
-for year in INTERVAL_1:
-    y.append(raw_data.get_daily_temp('BOSTON', 1, 10, year))
-models = generate_models(x, y, [1])
-evaluate_models_on_training(x, y, models)
+# for year in INTERVAL_1:
+#     y.append(raw_data.get_daily_temp('BOSTON', 1, 10, year))
+# models = generate_models(x, y, [1])
+# evaluate_models_on_training(x, y, models)
 
 
 # Problem 4: FILL IN MISSING CODE TO GENERATE y VALUES
@@ -197,5 +218,7 @@ x1 = INTERVAL_1
 x2 = INTERVAL_2
 y = []
 # MISSING LINES
+for year in x1:
+    y.append(np.mean(raw_data.get_yearly_temp('BOSTON', year)))
 models = generate_models(x, y, [1])    
 evaluate_models_on_training(x, y, models)
